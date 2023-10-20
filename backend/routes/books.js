@@ -9,13 +9,16 @@ router.post('/', auth, multer, bookCtrl.createBook);
   
 router.put('/:id', auth, multer, bookCtrl.modifyBook);
 
-router.delete('/:id', auth,bookCtrl.deleteBook);
+router.delete('/:id', auth, bookCtrl.deleteBook);
 
-router.get(':id', auth,bookCtrl.getOneBook);
+router.get('/:id', bookCtrl.getOneBook);
   
-router.get('/', auth, bookCtrl.findAllBooks);
+router.get('/', bookCtrl.findAllBooks);
 
 router.post('/:id/rating', auth, bookCtrl.addRatingToBook);
+
+router.post('/:id/bestrating', bookCtrl.getBestRatings);
+
 
 
 module.exports = router;
