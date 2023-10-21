@@ -2,8 +2,19 @@ const Book = require("../models/Book");
 const fs = require("fs");
 exports.createBook = (req, res, next) => {
 	const bookObject = JSON.parse(req.body.book);
+	console.log(bookObject)
 	delete bookObject._id;
 	delete bookObject._userId;
+	
+	if (!bookObject.ratings || bookObject.ratings.length === 0) {
+		// If no ratings are provided, create an initial rating with 0
+		bookObject.ratings = [{
+			userId: req.auth.userId,
+			rating: 0
+		}];
+	}
+
+	console.log(bookObject.ratings)
 	const book = new Book({
 		...bookObject,
 		userId: req.auth.userId,
@@ -94,48 +105,47 @@ exports.findAllBooks = (req, res, next) => {
 };
 
 exports.addRatingToBook = async (req, res, next) => {
-	const bookId = req.params.id;
-	const { userId, rating } = req.body;
+    const bookId = req.params.id;
+    const { userId, rating } = req.body;
 
-	try {
-		const book = await Book.findById(bookId);
+    try {
+        const book = await Book.findById(bookId);
 
-		if (!book) {
-			return res.status(404).json({ error });
-		}
+        if (!book) {
+            return res.status(404).json({ error: "Book not found" });
+        }
 
-		const existingRating = book.ratings.find(
-			(existingRating) => existingRating.userId === userId
-		);
+        const existingRating = book.ratings.find((existingRating) => existingRating.userId === userId);
 
-		if (existingRating) {
-			return res
-				.status(400)
-				.json({ error: "User has already rated the book." });
-		}
+        if (existingRating) {
+            return res.status(400).json({ error: "User has already rated the book." });
+        }
 
-		const newRating = {
-			userId: userId,
-			rating: rating,
-		};
+        if (isNaN(rating) || rating < 1 || rating > 5) { 
+            return res.status(400).json({ error: "Invalid grade value. Please provide a valid grade between 1 and 5." });
+        }
 
-		book.ratings.push(newRating);
+        const newRating = {
+            userId: userId,
+            grade: rating, 
+        };
 
-		let totalRating = 0;
 
-		for (const bookRating of book.ratings) {
-			totalRating += bookRating.rating; // Use bookRating
-		}
+        book.ratings.push(newRating);
+		console.log(newRating)
+		console.log(rating)
+		console.log(req.body)
 
-		book.averageRating = totalRating / book.ratings.length;
 
-		await book.save();
+        await book.save();
 
-		return res.status(200).json(book);
-	} catch (error) {
-		return res.status(500).json({ error });
-	}
+        return res.status(200).json(book);
+    } catch (error) {
+        return res.status(500).json({ error });
+    }
 };
+
+
 exports.getBestRatings = (req, res, next) => {
 	Book.find()
 		.sort({ averageRating: -1 })
