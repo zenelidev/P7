@@ -132,12 +132,6 @@ exports.addRatingToBook = async (req, res, next) => {
 
         book.ratings.push(newRating);
 		
-
-		console.log(newRating)
-		console.log(grade)
-		console.log(req.body)
-
-
         await book.save();
 
         return res.status(200).json(book);
