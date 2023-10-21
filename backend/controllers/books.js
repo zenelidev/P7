@@ -95,7 +95,7 @@ exports.findAllBooks = (req, res, next) => {
 
 exports.addRatingToBook = async (req, res, next) => {
 	const bookId = req.params.id;
-	const { userId, grade } = req.body;
+	const { userId, rating } = req.body;
 
 	try {
 		const book = await Book.findById(bookId);
@@ -103,9 +103,11 @@ exports.addRatingToBook = async (req, res, next) => {
 		if (!book) {
 			return res.status(404).json({ error });
 		}
+
 		const existingRating = book.ratings.find(
-			(rating) => rating.userId === userId
+			(existingRating) => existingRating.userId === userId
 		);
+
 		if (existingRating) {
 			return res
 				.status(400)
@@ -114,15 +116,17 @@ exports.addRatingToBook = async (req, res, next) => {
 
 		const newRating = {
 			userId: userId,
-			grade: grade,
+			rating: rating,
 		};
 
 		book.ratings.push(newRating);
 
 		let totalRating = 0;
-		for (const rating of book.ratings) {
-			totalRating += rating.grade;
+
+		for (const bookRating of book.ratings) {
+			totalRating += bookRating.rating; // Use bookRating
 		}
+
 		book.averageRating = totalRating / book.ratings.length;
 
 		await book.save();
@@ -132,7 +136,6 @@ exports.addRatingToBook = async (req, res, next) => {
 		return res.status(500).json({ error });
 	}
 };
-
 exports.getBestRatings = (req, res, next) => {
 	Book.find()
 		.sort({ averageRating: -1 })
