@@ -1,5 +1,5 @@
 const Book = require("../models/Book");
-
+const fs = require("fs");
 exports.createBook = (req, res, next) => {
 	const bookObject = JSON.parse(req.body.book);
 	delete bookObject._id;
@@ -94,7 +94,7 @@ exports.findAllBooks = (req, res, next) => {
 };
 
 exports.addRatingToBook = async (req, res, next) => {
-	const bookId = req.params.bookId;
+	const bookId = req.params.id;
 	const { userId, grade } = req.body;
 
 	try {
@@ -135,13 +135,13 @@ exports.addRatingToBook = async (req, res, next) => {
 
 exports.getBestRatings = (req, res, next) => {
 	Book.find()
-    .sort({ averageRating: -1 }) 
-    .limit(3) 
-    .exec()
-    .then((books) => {
-      res.status(200).json(books);
-    })
-    .catch((error) => {
-      res.status(500).json({ error });
-    });
-}
+		.sort({ averageRating: -1 })
+		.limit(3)
+		.exec()
+		.then((books) => {
+			res.status(200).json(books);
+		})
+		.catch((error) => {
+			res.status(500).json({ error });
+		});
+};
