@@ -6,15 +6,14 @@ exports.createBook = (req, res, next) => {
 	delete bookObject._id;
 	delete bookObject._userId;
 	
-	if (!bookObject.ratings || bookObject.ratings.length === 0) {
-		// If no ratings are provided, create an initial rating with 0
-		bookObject.ratings = [{
-			userId: req.auth.userId,
-			rating: 0
-		}];
-	}
+	// if (!bookObject.ratings || bookObject.ratings.length === 0) {
+	// 	// If no ratings are provided, create an initial rating with 0
+	// 	bookObject.ratings = [{
+	// 		userId: req.auth.userId,
+	// 		rating: 0
+	// 	}];
+	// }
 
-	console.log(bookObject.ratings)
 	const book = new Book({
 		...bookObject,
 		userId: req.auth.userId,
@@ -121,9 +120,9 @@ exports.addRatingToBook = async (req, res, next) => {
             return res.status(400).json({ error: "User has already rated the book." });
         }
 
-        if (isNaN(rating) || rating < 1 || rating > 5) { 
-            return res.status(400).json({ error: "Invalid grade value. Please provide a valid grade between 1 and 5." });
-        }
+        // if (isNaN(grade) || grade < 1 || grade > 5) { 
+        //     return res.status(400).json({ error: "Invalid grade value. Please provide a valid grade between 1 and 5." });
+        // }
 
         const newRating = {
             userId: userId,
@@ -132,8 +131,10 @@ exports.addRatingToBook = async (req, res, next) => {
 
 
         book.ratings.push(newRating);
+		
+
 		console.log(newRating)
-		console.log(rating)
+		console.log(grade)
 		console.log(req.body)
 
 
